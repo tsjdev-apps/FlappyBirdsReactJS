@@ -69,18 +69,24 @@ class Game extends React.Component {
       {position: 29, height: 2, upright: false},
     ]
 
-    this.state = {grid:grid, bird:bird, towers:towers}
+    this.state = {grid:grid, bird:bird, towers:towers, crashed:false}
 
     this.timerID = setInterval( () => {
+
+      if (this.state.crashed)
+        return;
+
       var gridCopy = []
       for(let i = 0; i < 20; i++) {
         gridCopy.push(new Array(30).fill('red'))
       }
 
+      var crashed = false
       var birdCopy = this.state.bird
       birdCopy.height++
       if (birdCopy.height > 19 || birdCopy.height < 0) {
         birdCopy.height = 10
+        crashed = true
       }
       gridCopy[birdCopy.height][birdCopy.position] = 'yellow'
 
@@ -104,9 +110,14 @@ class Game extends React.Component {
       }
 
       for(let i = 0; i < 20; i++) {
-        if (gridCopy[i][2] == 'blue' && birdCopy.height == i) {
+        if (gridCopy[i][2] === 'blue' && birdCopy.height === i) {
           birdCopy.height = 10
+          crashed = true
         }
+      }
+
+      if (crashed) {
+        this.setState({crashed:true})
       }
 
       this.setState({grid:gridCopy, bird:birdCopy})
@@ -114,15 +125,23 @@ class Game extends React.Component {
   }
 
   handleClick() {
+    if (this.state.crashed)
+      return
+
     var birdCopy = this.state.bird
     birdCopy.height -= 3
     this.setState({bird:birdCopy})
+  }
+
+  restart() {
+    this.setState({crashed:false})
   }
 
   render() {
     return (
       <div onClick={this.handleClick.bind(this)}>
         <Grid grid={this.state.grid}/>
+        {this.state.crashed ? <button onClick={this.restart.bind(this)}>Click here to restart the game...</button> : null}
       </div>
     )
   }
