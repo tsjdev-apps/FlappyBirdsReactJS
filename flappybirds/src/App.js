@@ -103,6 +103,12 @@ class Game extends React.Component {
         }
       }
 
+      for(let i = 0; i < 20; i++) {
+        if (gridCopy[i][2] == 'blue' && birdCopy.height == i) {
+          birdCopy.height = 10
+        }
+      }
+
       this.setState({grid:gridCopy, bird:birdCopy})
     }, 200)
   }
